@@ -1,11 +1,13 @@
 package labtest01;
 
+import java.util.Comparator;
+
 /**
  * An item in a grocery store: 
  * Jar of peanut butter, package of pasta,
  * whatever.
  */
-public class Item
+public class Item implements Comparable<Item>
 {
 	private final String aName;
 	private final int aId;
@@ -47,4 +49,30 @@ public class Item
 	{
 		return aPrice;
 	}
+
+	@Override
+	public int compareTo(Item pItem)
+	{
+		return getPrice() - pItem.getPrice();
+	}
+	/**
+	 * 
+	 * @return priceComparator
+	 */
+	public static Comparator<Item> getPriceComparator() 
+	{
+		return new Comparator<Item>() 
+		{
+
+			@Override
+			public int compare(Item pItem1, Item pItem2)
+			{
+				// TODO Auto-generated method stub
+				return pItem1.getPrice() - pItem2.getPrice();
+			}
+			
+		};
+	}
+
+
 }
