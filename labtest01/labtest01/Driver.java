@@ -3,6 +3,7 @@ package labtest01;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observer;
 
 /**
  * Utility class with a driver program and some 
@@ -25,29 +26,42 @@ public final class Driver
 	 */
 	public static void main(String[] pArgs)
 	{
-		Inventory aInventory = new Inventory("testInventory");
-		Item notInInventory = new Item("TEST", 1, 20);
-		List<Item> sortedList = new ArrayList<Item>();
-		for( Item item : ITEMS )
-		{
-			sortedList.add(item);
-			aInventory.stock(item, TEN);
-		}
-		System.out.println("List before sorting:");
-		for(Item i : sortedList) 
-		{
-			System.out.println(i.getName());
-		}
-		Collections.sort(sortedList, Item.getPriceComparator());
-		Collections.sort(sortedList);
-		System.out.println("List after sorting:");
-		for(Item i : sortedList) 
-		{
-			System.out.println(i.getName());
-		}
-		System.out.println(aInventory.totalValue());
-		aInventory.dispose(ITEM_CEREAL, 1);
-		System.out.println(aInventory.totalValue());
-		aInventory.dispose(notInInventory, TEN);
+		Inventory aInventory1 = new Inventory("testInventory1");
+		Inventory aInventory2 = new Inventory("testInventory2");
+		Inventory aInventory3 = new Inventory("testInventory3");
+		
+		Corporation aCorporation = new Corporation();
+		
+		AbstarctCorporationLogger aEnglish = new EnglishObserver();
+		AbstarctCorporationLogger aFrench = new FrenchObserver();
+		
+		aCorporation.addObserver(aFrench);
+		aCorporation.addObserver(aEnglish);
+		
+		aCorporation.addInventory(aInventory1);
+		aCorporation.addInventory(aInventory2);
+		aCorporation.addInventory(aInventory3);
+//		Item notInInventory = new Item("TEST", 1, 20);
+//		List<Item> sortedList = new ArrayList<Item>();
+//		for( Item item : ITEMS )
+//		{
+//			sortedList.add(item);
+//			aInventory.stock(item, TEN);
+//		}
+//		System.out.println("List before sorting:");
+//		for(Item i : sortedList) 
+//		{
+//			System.out.println(i.getName());
+//		}
+//		Collections.sort(sortedList, Item.getPriceComparator());
+//		Collections.sort(sortedList);
+//		System.out.println("List after sorting:");
+//		for(Item i : sortedList) 
+//		{
+//			System.out.println(i.getName());
+//		}
+//		System.out.println(aInventory.totalValue());
+//		aInventory.dispose(ITEM_CEREAL, 1);
+//		System.out.println(aInventory.totalValue());
 	}
 }
