@@ -1,15 +1,22 @@
 package labtest01;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Represents the inventory of a 
  * physical grocery store.
  */
-public class Inventory
+public class Inventory implements Visitable
 {
 	private final String aName; // Unique
 	private final HashMap<Item, Integer> aInventory = new HashMap<>();
+	private final Lock aLock = new ReentrantLock();
+	private final Condition aCond = aLock.newCondition();
 	
 	/**
 	 * Creates a new inventory with no items in it,
@@ -36,6 +43,7 @@ public class Inventory
 	 */
 	public void stock(Item pItem, int pQuantity)
 	{
+		aLock.lock();
 		int amount = 0;
 		if( aInventory.containsKey(pItem))
 		{
@@ -43,6 +51,9 @@ public class Inventory
 		}
 		amount += pQuantity;
 		aInventory.put(pItem, amount);
+		System.out.println("Added " + pQuantity + " of " + pItem.getName() );
+		aCond.signalAll();
+		aLock.unlock();
 	}
 	
 	/**
@@ -55,11 +66,38 @@ public class Inventory
 	 */
 	public void dispose(Item pItem, int pQuantity)
 	{
-		assert aInventory.containsKey(pItem);
-		assert pQuantity > 0;
-		int amount = aInventory.get(pItem);
-		amount -= pQuantity;
-		aInventory.put(pItem, amount);
+		
+		aLock.lock();
+		if (!aInventory.containsKey(pItem)) {
+			try
+			{
+				aCond.await();
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			assert aInventory.containsKey(pItem);
+			assert pQuantity > 0;
+			System.out.println("TETS");
+			int amount = aInventory.get(pItem);
+			while(amount < pQuantity) {
+				try
+				{
+					aCond.await();
+				}
+				catch (InterruptedException e)
+				{
+					return;
+				}
+			}
+			amount -= pQuantity;
+			aInventory.put(pItem, amount);
+			System.out.println("Removed " + pQuantity + " of " + pItem.getName() );
+			aLock.unlock();
+		}
 	}
 	
 	/**
@@ -90,5 +128,15 @@ public class Inventory
 			totalQuantity += aInventory.get(item);
 		}
 		return totalQuantity;
+	}
+	
+	public Map<Item,Integer> getInvetory() {
+		return Collections.unmodifiableMap(aInventory);
+	}
+
+	@Override
+	public int accept(Visitor v)
+	{
+		return v.visitInventory(this);
 	}
 }

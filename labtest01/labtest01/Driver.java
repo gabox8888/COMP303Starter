@@ -32,22 +32,36 @@ public final class Driver
 		
 		Corporation aCorporation = new Corporation();
 		
-		AbstarctCorporationLogger aEnglish = new EnglishObserver();
-		AbstarctCorporationLogger aFrench = new FrenchObserver();
+		CountItemsVisitor v = new CountItemsVisitor();
 		
-		aCorporation.addObserver(aFrench);
-		aCorporation.addObserver(aEnglish);
+//		AbstarctCorporationLogger aEnglish = new EnglishObserver();
+//		AbstarctCorporationLogger aFrench = new FrenchObserver();
+		
+//		aCorporation.addObserver(aFrench);
+//		aCorporation.addObserver(aEnglish);
 		
 		aCorporation.addInventory(aInventory1);
 		aCorporation.addInventory(aInventory2);
 		aCorporation.addInventory(aInventory3);
-//		Item notInInventory = new Item("TEST", 1, 20);
-//		List<Item> sortedList = new ArrayList<Item>();
-//		for( Item item : ITEMS )
-//		{
-//			sortedList.add(item);
-//			aInventory.stock(item, TEN);
-//		}
+		Item notInInventory = new Item("TEST", 1, 20);
+		List<Item> sortedList = new ArrayList<Item>();
+		for( Item item : ITEMS )
+		{
+			aInventory1.stock(item, TEN);
+			aInventory2.stock(item, TEN);
+			aInventory3.stock(item, TEN);
+		}
+		
+		aInventory1.accept(v);
+		aInventory2.accept(v);
+		aInventory3.accept(v);
+		aCorporation.accept(v);
+		
+		AddItemThread t1 = new AddItemThread(aInventory1, ITEMS[0]);
+		RemoveItemThread t2 = new RemoveItemThread(aInventory1, ITEMS[0]);
+		
+		t1.start();
+		t2.start();
 //		System.out.println("List before sorting:");
 //		for(Item i : sortedList) 
 //		{
